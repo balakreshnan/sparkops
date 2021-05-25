@@ -36,12 +36,6 @@ steps:
 - script: git checkout
   displayName: 'Get Latest Branch'
 
-- script: |
-    cd $(Build.Repository.LocalPath)/libraries/python/dbxdemo
-    python3 setup.py sdist bdist_wheel
-    ls dist/
-  displayName: 'Build Python Wheel for Libs'
-
 - task: PublishTestResults@2
   inputs:
     testResultsFiles: '**/TEST-*.xml'
