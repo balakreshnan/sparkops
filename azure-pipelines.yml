@@ -48,7 +48,7 @@ steps:
 - task: configuredatabricks@0
   inputs:
     url: 'https://adb-4433353838071267.7.azuredatabricks.net'
-    token: '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'
+    token: '$(databricks_token)'
 
 - task: startcluster@0
   inputs:
