@@ -58,3 +58,8 @@ steps:
   inputs:
     notebookPath: '/Users/babal@microsoft.com/ML/xgboost-python'
     existingClusterId: '0203-173454-scums615'
+
+- task: executenotebook@0
+  inputs:
+    notebookPath: '/Users/babal@microsoft.com/ML/hyperopt-sklearn-model-selection'
+    existingClusterId: '0203-173454-scums615'
