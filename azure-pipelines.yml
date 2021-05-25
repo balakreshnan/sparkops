@@ -24,6 +24,12 @@ steps:
     addToPath: true
     architecture: 'x64'
 
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: 'notebooks'
+    Contents: '**'
+    TargetFolder: '$(Build.SourcesDirectory)'
+
 - task: DownloadGitHubRelease@0
   inputs:
     connection: 'balakreshnan'
