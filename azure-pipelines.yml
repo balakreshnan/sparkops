@@ -36,6 +36,12 @@ steps:
 - script: git checkout
   displayName: 'Get Latest Branch'
 
+- task: CmdLine@2
+  inputs:
+    script: 'echo Write your commands here. ls $(agent.builddirectory)' 
+    #workingDirectory: # Optional
+    #failOnStderr: false # Optional
+
 
 - script: |
     git diff --name-only --diff-filter=AMR HEAD^1 HEAD | xargs -I '{}' cp --parents -r '{}' $(Build.BinariesDirectory)
