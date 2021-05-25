@@ -44,3 +44,17 @@ steps:
       # Write your commands here
       
       ls -l $(System.ArtifactsDirectory)
+
+- task: configuredatabricks@0
+  inputs:
+    url: 'https://adb-4433353838071267.7.azuredatabricks.net'
+    token: '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'
+
+- task: startcluster@0
+  inputs:
+    clusterid: '0203-173454-scums615'
+
+- task: executenotebook@0
+  inputs:
+    notebookPath: 'Users/babal@microsoft.com/ML/xgboost-python'
+    existingClusterId: '0203-173454-scums615'
