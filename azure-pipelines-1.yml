@@ -24,6 +24,8 @@ steps:
   displayName: 'Install databricks-cli'
 
 - script: |
+   databricks fs cp /notebooks/Users/babal@microsoft.com/ML/ dbfs:/tmp/notebooks/Users/babal@microsoft.com/ML --recursive --overwrite
+
    databricks workspace import_dir / $(notebook-folder) -o
 
    JOB_ID=$(databricks jobs create --json '{
