@@ -24,16 +24,6 @@ steps:
     addToPath: true
     architecture: 'x64'
 
-- task: GitHubRelease@1
-  inputs:
-    gitHubConnection: balakreshnan
-    repositoryName: '$(Build.Repository.Name)'
-    action: 'create'
-    target: '$(Build.SourceVersion)'
-    tagSource: 'gitTag'
-    changeLogCompareToRelease: 'lastFullRelease'
-    changeLogType: 'commitBased'
-
 - task: DownloadGitHubRelease@0
   inputs:
     connection: 'balakreshnan'
