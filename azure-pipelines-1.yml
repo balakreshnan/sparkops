@@ -11,7 +11,7 @@ pool:
 
 variables:
   databricks-host: 'https://centralus.azuredatabricks.net'
-  notebook-folder: 'notebooks/Users/babal@microsoft.com/ML/'
+  notebook-folder: '/notebooks/Users/babal@microsoft.com/ML/'
   cluster-id: '0203-173454-scums615'
   notebook-name: 'xgboost-python.py'
 
