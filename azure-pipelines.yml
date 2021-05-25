@@ -56,5 +56,5 @@ steps:
 
 - task: executenotebook@0
   inputs:
-    notebookPath: 'Users/babal@microsoft.com/ML/xgboost-python'
+    notebookPath: '/Users/babal@microsoft.com/ML/xgboost-python'
     existingClusterId: '0203-173454-scums615'
