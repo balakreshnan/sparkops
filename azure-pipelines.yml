@@ -52,14 +52,14 @@ steps:
 
 - task: startcluster@0
   inputs:
-    clusterid: '0203-173454-scums615'
+    clusterid: '$(clusterid)'
 
 - task: executenotebook@0
   inputs:
     notebookPath: '/Users/babal@microsoft.com/ML/xgboost-python'
-    existingClusterId: '0203-173454-scums615'
+    existingClusterId: '$(clusterid)'
 
 - task: executenotebook@0
   inputs:
     notebookPath: '/Users/babal@microsoft.com/ML/pytorch-single-node'
-    existingClusterId: '0527-180754-mogul636'
+    existingClusterId: '$(clusterid)'
