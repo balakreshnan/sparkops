@@ -63,3 +63,9 @@ steps:
   inputs:
     notebookPath: '/Users/babal@microsoft.com/ML/pytorch-single-node'
     existingClusterId: '$(clusterid)'
+
+
+- task: executenotebook@0
+  inputs:
+    notebookPath: '/Users/babal@microsoft.com/ML/mlflowexp'
+    existingClusterId: '$(clusterid)'
