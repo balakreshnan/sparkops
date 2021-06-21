@@ -146,11 +146,23 @@ print(rfModel)  # summary only
 
 # COMMAND ----------
 
-
+from pyspark.ml import Pipeline
+from pyspark.ml.classification import RandomForestClassifier
+from pyspark.ml.feature import IndexToString, StringIndexer, VectorIndexer
+from pyspark.ml.evaluation import MulticlassClassificationEvaluator
 
 # COMMAND ----------
 
-featurescol = ["PassengerId", "Pclass", "Age", "SibSp", "Parch", "Fare"]
+categoricalColumns = [item[0] for item in titanicds1.dtypes if item[1].startswith('string') ]
+
+# COMMAND ----------
+
+categoricalColumns
+
+# COMMAND ----------
+
+#featurescol = ["PassengerId", "Pclass", "Age", "SibSp", "Parch", "Fare"]
+featurescol = ["PassengerId", "Survived", "Pclass", "Age", "SibSp", "Parch", "Fare"]
 
 # COMMAND ----------
 
@@ -158,10 +170,34 @@ featurescol = ["PassengerId", "Pclass", "Age", "SibSp", "Parch", "Fare"]
 
 # COMMAND ----------
 
+#assembler = VectorAssembler(inputCols=featurescol, outputCol="features")
+
+# COMMAND ----------
+
+stages = []
+
+# COMMAND ----------
+
+#iterate through all categorical values
+for categoricalCol in categoricalColumns:
+    #create a string indexer for those categorical values and assign a new name including the word 'Index'
+    stringIndexer = StringIndexer(inputCol = categoricalCol, outputCol = categoricalCol + 'Index')
+
+    #append the string Indexer to our list of stages
+    stages += [stringIndexer]
+
+# COMMAND ----------
+
+stages
+
+# COMMAND ----------
+
 labelIndexer = StringIndexer(inputCol="Survived", outputCol="indexedLabel").fit(titanicds1)
 
-#featureIndexer =\
-#    VectorIndexer(inputCol="PassengerId, Pclass, Name, Sex, Age, SibSp, Parch, Ticket, Fare, Cabin, Embarked", outputCol="indexedFeatures").fit(titanicds1)
+#assembler = VectorAssembler(inputCols=featurescol, outputCol="features")
+assembler = VectorAssembler(inputCols=featurescol, outputCol="features")
+
+#featureIndexer = VectorIndexer(inputCol="features", outputCol="indexedFeatures", maxCategories=4).fit(titanicds1)
 
 
 (trainingData, testData) = titanicds1.randomSplit([0.7, 0.3])
@@ -172,10 +208,16 @@ rf = RandomForestClassifier(labelCol="indexedLabel", featuresCol="features", num
 # Convert indexed labels back to original labels.
 labelConverter = IndexToString(inputCol="prediction", outputCol="predictedLabel",
                                labels=labelIndexer.labels)
-assembler = VectorAssembler(inputCols=featurescol, outputCol="features")
+
 
 # Chain indexers and forest in a Pipeline
-pipeline = Pipeline(stages=[labelIndexer, assembler, rf, labelConverter])
+#pipeline = Pipeline(stages=[labelIndexer, assembler, rf, labelConverter])
+stages += [labelIndexer]
+stages += [assembler]
+stages += [rf]
+stages += [labelConverter]
+
+pipeline = Pipeline(stages=stages)
 
 # Train model.  This also runs the indexers.
 model = pipeline.fit(trainingData)
