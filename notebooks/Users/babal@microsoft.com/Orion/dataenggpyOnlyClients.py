@@ -126,6 +126,19 @@ display(TWRPerformancedf.groupBy("DataSourceKey").count().orderBy("DataSourceKey
 
 # COMMAND ----------
 
+from pyspark.sql import functions as F
+display(TWRPerformancedf.groupBy("AccountAge").agg(F.mean('MarketValue'), F.count('MarketValue')))
+
+# COMMAND ----------
+
+display(TWRPerformancedf.groupBy("DataSourceKey").agg(F.mean('MarketValue'), F.count('MarketValue')))
+
+# COMMAND ----------
+
+display(TWRPerformancedf.groupBy("HouseholdAge").agg(F.mean('MarketValue'), F.count('MarketValue')))
+
+# COMMAND ----------
+
 # (590, 1316, 1008, 98, 902, 320, --churned
 # 195, 203, 424, 1531, 1971, 1590 --not churned)
 
@@ -375,19 +388,108 @@ display(selected)
 
 # COMMAND ----------
 
-
-
-# COMMAND ----------
-
-
+display(FeeRatiossdf)
 
 # COMMAND ----------
 
-
+display(FeeRatiossdf.groupBy("DataSourceKey").count())
 
 # COMMAND ----------
 
+display(FeeRatiossdf.groupBy("AccountAge").agg(F.mean('MarketValue'), F.count('MarketValue')))
 
+# COMMAND ----------
+
+FeeRatiossdf = FeeRatiossdf.withColumn("churned" , f.when(f.col('DataSourceKey').isin(churn) , 1))
+
+# COMMAND ----------
+
+FeeRatiossdf = FeeRatiossdf.withColumn("churned" , f.when(f.col('churned') == 1 , 1).otherwise(0))
+
+# COMMAND ----------
+
+display(FeeRatiossdf.groupBy("churned").count().orderBy("churned"))
+
+# COMMAND ----------
+
+FeeRatiossdf.columns
+
+# COMMAND ----------
+
+from pyspark.ml import Pipeline
+from pyspark.ml.classification import DecisionTreeClassifier
+from pyspark.ml.feature import StringIndexer, VectorIndexer
+from pyspark.ml.evaluation import MulticlassClassificationEvaluator
+import pyspark
+from pyspark.ml import Pipeline
+from pyspark.ml.feature import StringIndexer, VectorAssembler
+ 
+from distutils.version import LooseVersion
+
+# COMMAND ----------
+
+labelIndexer = StringIndexer(inputCol="churned", outputCol="indexedLabel").fit(FeeRatiossdf)
+
+# COMMAND ----------
+
+features = ["FeeSummaryKey", "DataSourceKey", "SnapshotMonthKey", "FirmKey", "AccountKey", "RepresentativeKey", "AccountAssetRangeKey", "AccountFeeRangeKey", "HouseholdAssetRangeKey", "HouseholdFeeRangeKey", "IsNewKey", "IsQualifiedKey", "IsIRAKey", "CID", "AID", "AccountAnnualizedFeeAmount", "AccountMarketValue", "AccountEffectiveFeePercentage", "HouseholdAnnualizedFeeAmount", "HouseholdMarketValue", "HouseholdEffectiveFeePercentage", "ManagementExpenseAmount", "AccountAnnualizedFeeAmountWithManagementExpense", "AccountEffectiveFeePercentageWithManagementExpense", "HouseholdAnnualizedFeeAmountWithManagementExpense", "HouseholdEffectiveFeePercentageWithManagementExpense", "AccountFeeRangeWithManagementExpenseKey", "HouseholdFeeRangeWithManagementExpenseKey", "HouseholdManagementExpenseAmount"]
+
+# COMMAND ----------
+
+(trainingData, testData) = FeeRatiossdf.randomSplit([0.7, 0.3])
+
+# COMMAND ----------
+
+stages = []
+
+# COMMAND ----------
+
+label_stringIdx = StringIndexer(inputCol="churned", outputCol="label")
+stages += [label_stringIdx]
+
+# COMMAND ----------
+
+assembler = VectorAssembler(inputCols=features, outputCol="features")
+stages += [assembler]
+
+# COMMAND ----------
+
+from pyspark.ml.classification import LogisticRegression
+
+# COMMAND ----------
+
+partialPipeline = Pipeline().setStages(stages)
+pipelineModel = partialPipeline.fit(FeeRatiossdf)
+preppedDataDF = pipelineModel.transform(FeeRatiossdf)
+
+# COMMAND ----------
+
+# Fit model to prepped data
+lrModel = LogisticRegression().fit(preppedDataDF)
+
+# COMMAND ----------
+
+# ROC for training data
+display(lrModel, preppedDataDF, "ROC")
+
+# COMMAND ----------
+
+### Randomly split data into training and test sets. set seed for reproducibility
+(trainingData, testData) = FeeRatiossdf.randomSplit([0.7, 0.3], seed=100)
+print(trainingData.count())
+print(testData.count())
+
+# COMMAND ----------
+
+from pyspark.ml.classification import LogisticRegression
+ 
+# Create initial LogisticRegression model
+lr = LogisticRegression(labelCol="label", featuresCol="features", maxIter=10)
+
+# COMMAND ----------
+
+# Train model with Training Data
+lrModel = lr.fit(trainingData)
 
 # COMMAND ----------
 
