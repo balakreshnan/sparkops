@@ -213,7 +213,7 @@ predictions.select("predictedLabel", "churned", "features").show(5)
 evaluator = MulticlassClassificationEvaluator(
     labelCol="indexedLabel", predictionCol="prediction", metricName="accuracy")
 accuracy = evaluator.evaluate(predictions)
-print("Accuracy = %g", accuracy)
+print("Accuracy = ", accuracy)
 print("Test Error = %g" % (1.0 - accuracy))
 
 rfModel = model.stages[2]
