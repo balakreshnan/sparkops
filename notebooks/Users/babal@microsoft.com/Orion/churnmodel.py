@@ -218,3 +218,15 @@ print("Test Error = %g" % (1.0 - accuracy))
 
 rfModel = model.stages[2]
 print(rfModel)  # summary only
+
+# COMMAND ----------
+
+display(FeeRatiossdf)
+
+# COMMAND ----------
+
+FeeRatiossdf.repartition(1).write.format("csv").save("wasbs://dsppsample@orionstoreds.blob.core.windows.net/output1/freeratio.csv")
+
+# COMMAND ----------
+
+FeeRatiossdf.coalesce(1).write.csv("wasbs://dsppsample@orionstoreds.blob.core.windows.net/output2/freeratio.csv",header=True) 
